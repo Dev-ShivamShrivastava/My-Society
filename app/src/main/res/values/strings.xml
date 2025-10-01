@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">My Society</string>
+    <string name="inspection_request_message">
+        Send Inspection Request\n
+        Thank you for submitting your request!\n
+        Our team will connect with you shortly.\n
+        For faster assistance, you can reach directly via WhatsApp or Call.
+    </string>
+
+</resources>
