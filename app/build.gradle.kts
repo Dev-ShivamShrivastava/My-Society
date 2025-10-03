@@ -44,6 +44,9 @@ android {
 
 dependencies {
 
+    implementation(project(":data"))
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -72,10 +75,23 @@ dependencies {
     //Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.retrofit.moshi)
+
+
+    //Okhttp3
+    implementation(libs.okHttp3)
+
 
     //Coil
     implementation(libs.coil.compose)
 
     //Datastore
     implementation(libs.androidx.datastore.preferences)
+
+    //Moshi
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    ksp(libs.moshi.codegen)
+
+
 }

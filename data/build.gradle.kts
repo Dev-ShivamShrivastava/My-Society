@@ -16,6 +16,10 @@ dependencies {
     api(project(":domain"))
     implementation(libs.kotlinx.coroutines.android)
 
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:5.1.0"))
-    implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation(libs.retrofit)
+
+    implementation(libs.javax.inject)
+
+    implementation("com.google.code.gson:gson:2.10.1")
+
 }

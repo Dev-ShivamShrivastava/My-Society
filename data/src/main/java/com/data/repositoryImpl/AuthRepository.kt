@@ -1,21 +1,25 @@
 package com.data.repositoryImpl
 
 import com.data.api.ApiInterface
+import com.data.api.safeApiCall
+import com.domain.api.AppResult
+import com.domain.model.request.CreateUserRequest
 import com.domain.model.request.LoginRequest
+import com.domain.model.response.CreateUserResponse
 import com.domain.model.response.StandardResponse
 import com.domain.repository.IAuthRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class AuthRepository(val apiInterface: ApiInterface) : IAuthRepository {
 
-    override suspend fun login(
+class AuthRepository @Inject constructor(val apiInterface: ApiInterface) : IAuthRepository {
+
+    override suspend fun loginApi(
         loginRequest: LoginRequest
-    ): Flow<StandardResponse> {
-        val response =apiInterface.loginApi(loginRequest)
-        return flow {
-            emit(response)
-        }
+    ): AppResult<StandardResponse> {
+        return safeApiCall{ apiInterface.loginApi(loginRequest) }
+    }
 
+    override suspend fun createUserApi(createUserRequest: CreateUserRequest): AppResult<CreateUserResponse> {
+        return safeApiCall{ apiInterface.createUserApi(createUserRequest) }
     }
 }

@@ -1,3 +1,4 @@
 package com.data.api
 
-const val loginApi = "login"
+const val loginAPI = "login"
+const val createUserAPI = "createUser"

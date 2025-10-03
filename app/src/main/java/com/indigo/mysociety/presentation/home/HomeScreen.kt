@@ -1,4 +1,4 @@
-package com.indigo.mysociety.presentation
+package com.indigo.mysociety.presentation.home
 
 import android.app.Activity
 import android.content.Intent
@@ -39,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.indigo.mysociety.R
 import com.indigo.mysociety.presentation.commonUI.LabeledInput
 import com.indigo.mysociety.utils.MyFontFamily
@@ -64,6 +66,17 @@ import com.indigo.mysociety.utils.MyFontFamily
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
+
+    val viewModel: HomeVM = hiltViewModel()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.toastEvent.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var service by remember { mutableStateOf("") }
@@ -79,7 +92,6 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
         label = "rotation"
     )
 
-    val context = LocalContext.current
 
     // 🔙 Handle back press
     BackHandler(enabled = true) {
@@ -375,23 +387,32 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
                                 )
 
                                 Spacer(Modifier.height(20.dp))
-                                Row(modifier = Modifier
-                                    .clickable {
-                                        try {
-                                            val phoneNumber = "919507318475" // 👈 add country code + number (without + sign)
-                                            val message = "Hello, I need some help!" // 👈 your default message
-                                            val url = "https://wa.me/$phoneNumber?text=${Uri.encode(message)}"
-                                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                                data = Uri.parse(url)
-                                                setPackage("com.whatsapp") // ensures only WhatsApp handles it
+                                Row(
+                                    modifier = Modifier
+                                        .clickable {
+                                            try {
+                                                val phoneNumber =
+                                                    "919507318475" // 👈 add country code + number (without + sign)
+                                                val message =
+                                                    "Hello, I need some help!" // 👈 your default message
+                                                val url = "https://wa.me/$phoneNumber?text=${
+                                                    Uri.encode(message)
+                                                }"
+                                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                                    data = Uri.parse(url)
+                                                    setPackage("com.whatsapp") // ensures only WhatsApp handles it
+                                                }
+                                                context.startActivity(intent)
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
+                                                Toast.makeText(
+                                                    context,
+                                                    "WhatsApp not installed",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
-                                            context.startActivity(intent)
-                                        } catch (e: Exception) {
-                                            e.printStackTrace()
-                                            Toast.makeText(context, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
                                         }
-                                    }
-                                    .padding(8.dp), // optional padding for touch target
+                                        .padding(8.dp), // optional padding for touch target
                                     verticalAlignment = Alignment.CenterVertically) {
                                     Image(
                                         painter = painterResource(id = R.drawable.whatsapp),
@@ -399,19 +420,25 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Spacer(Modifier.width(5.dp))
-                                    Text("Whatsapp", fontWeight = FontWeight.Medium, fontSize = 16.sp, color = Color(0xFF4EC817))
+                                    Text(
+                                        "Whatsapp",
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 16.sp,
+                                        color = Color(0xFF4EC817)
+                                    )
                                 }
 
                                 Spacer(Modifier.height(10.dp))
 
-                                Row( modifier = Modifier
-                                    .clickable {
-                                        val intent = Intent(Intent.ACTION_DIAL).apply {
-                                            data = Uri.parse("tel:1234567890")
+                                Row(
+                                    modifier = Modifier
+                                        .clickable {
+                                            val intent = Intent(Intent.ACTION_DIAL).apply {
+                                                data = Uri.parse("tel:1234567890")
+                                            }
+                                            context.startActivity(intent)
                                         }
-                                        context.startActivity(intent)
-                                    }
-                                    .padding(8.dp), // optional padding for touch target
+                                        .padding(8.dp), // optional padding for touch target
                                     verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_call),
@@ -420,7 +447,12 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
                                         tint = Color(0xFFEE6C70)
                                     )
                                     Spacer(Modifier.width(5.dp))
-                                    Text("Call Now", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFFEE6C70))
+                                    Text(
+                                        "Call Now",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        color = Color(0xFFEE6C70)
+                                    )
                                 }
 
 

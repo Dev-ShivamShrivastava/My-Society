@@ -13,9 +13,14 @@ kotlin {
 }
 
 dependencies {
+
+//    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+
     implementation(libs.kotlinx.coroutines.android)
 
-    implementation(libs.javax.inject)
 
     implementation(libs.retrofit)
+
+    implementation(libs.moshi)
+
 }

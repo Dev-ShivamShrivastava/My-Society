@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.indigo.mysociety.presentation.HomeScreen
+import com.indigo.mysociety.presentation.home.HomeScreen
 import com.indigo.mysociety.presentation.SignIn
-import com.indigo.mysociety.presentation.SignUp
+import com.indigo.mysociety.presentation.signUp.SignUp
 import com.indigo.mysociety.presentation.Splash
 
 @Composable
@@ -26,9 +26,7 @@ fun AppNavigation() {
         }
 
         composable(ScreensRoutes.SignUp.name) {
-            SignUp({ str, str1, str2, str3, str4 ->
-                navController.navigateUp()
-            }, {
+            SignUp({
                 navController.navigateUp()
             })
         }
