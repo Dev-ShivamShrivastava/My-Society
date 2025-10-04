@@ -26,6 +26,11 @@ fun Context.showToast(message: String) {
    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
 
+fun isValidEmail(email: String): Boolean {
+    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+    return emailRegex.matches(email)
+}
+
 @Composable
 fun CustomSnackBar(message: String, isError: Boolean) {
     Snackbar(

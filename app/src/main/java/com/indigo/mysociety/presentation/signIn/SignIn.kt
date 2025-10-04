@@ -1,4 +1,4 @@
-package com.indigo.mysociety.presentation
+package com.indigo.mysociety.presentation.signIn
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -20,10 +20,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,21 +42,48 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.domain.model.request.CreateUserRequest
+import com.domain.model.request.LoginRequest
 import com.indigo.mysociety.R
+import com.indigo.mysociety.presentation.signUp.SignUpVM
 import com.indigo.mysociety.utils.MyFontFamily
+import com.indigo.mysociety.utils.isValidEmail
+import com.indigo.mysociety.utils.showToast
 
 @Composable
 fun SignIn(
-    onLogin: (String, String) -> Unit,
+    onLogin: () -> Unit,
     onSignup: () -> Unit,
     onForgotPassword: () -> Unit,
     onGuestLogin: () -> Unit
 ) {
+    val viewModel: SignInVM = hiltViewModel()
+
     // Dynamic fields (state)
     var emailOrPhone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.toastEvent.collect { message ->
+            context.showToast(message)
+        }
+    }
+
+    // ⭐ React to API Response directly here
+    LaunchedEffect(state.response) {
+        state.response?.let { response ->
+            if (response.status == "Success") {
+                context.showToast(response.message ?: "Sign in successful")
+                onLogin() // ⭐ Go back after success
+            } else {
+                context.showToast(response.message ?: "Sign in failed")
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -79,7 +109,8 @@ fun SignIn(
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        )
+        {
             Spacer(Modifier.height(16.dp))
 
             Text(
@@ -192,7 +223,25 @@ fun SignIn(
 
             // Login Button
             Button(
-                onClick = { onLogin(emailOrPhone, password) },
+                onClick = {
+                    when {
+                        emailOrPhone.isBlank() -> {
+                            context.showToast("Email is required")
+                        }
+
+                        !isValidEmail(emailOrPhone) -> {
+                            context.showToast("Invalid Email")
+                        }
+
+                        password.isBlank() -> {
+                            context.showToast("Password is required")
+                        }
+                        else -> {
+                            viewModel.loginApi(LoginRequest(emailOrPhone, password))
+                        }
+                    }
+
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -248,13 +297,23 @@ fun SignIn(
             Spacer(Modifier.height(20.dp))
 
         }
+
+        // Loader overlay
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x88000000)), // semi-transparent background
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SignInPreview() {
-    SignIn({ str, str1 ->
-
-    }, {}, {}, {})
+    SignIn({}, {}, {}, {})
 }

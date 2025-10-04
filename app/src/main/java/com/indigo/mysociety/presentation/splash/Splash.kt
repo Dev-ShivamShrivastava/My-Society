@@ -1,4 +1,4 @@
-package com.indigo.mysociety.presentation
+package com.indigo.mysociety.presentation.splash
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -36,12 +37,17 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun Splash(onNavigate: (screenName: String) -> Unit){
+    val viewModel: SplashVM = hiltViewModel()
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
     val progress by animateLottieCompositionAsState(composition,iterations = LottieConstants.IterateForever)
     // Navigate after 3 seconds
     LaunchedEffect(Unit) {
-        delay(1000) // 3 seconds
-        onNavigate(ScreensRoutes.SignIn.name)
+        delay(2000) // 2 seconds
+        if (viewModel.token.isEmpty()){
+            onNavigate(ScreensRoutes.SignIn.name)
+        }else{
+            onNavigate(ScreensRoutes.Home.name)
+        }
     }
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (centerRef, progressRef) = createRefs()

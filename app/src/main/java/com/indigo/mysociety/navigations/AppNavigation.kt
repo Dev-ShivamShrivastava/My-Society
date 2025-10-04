@@ -5,9 +5,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.indigo.mysociety.presentation.home.HomeScreen
-import com.indigo.mysociety.presentation.SignIn
+import com.indigo.mysociety.presentation.signIn.SignIn
 import com.indigo.mysociety.presentation.signUp.SignUp
-import com.indigo.mysociety.presentation.Splash
+import com.indigo.mysociety.presentation.splash.Splash
 
 @Composable
 fun AppNavigation() {
@@ -16,12 +16,25 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = ScreensRoutes.Splash.name) {
 
         composable(ScreensRoutes.Splash.name) {
-            Splash {
-                navController.navigate(ScreensRoutes.SignIn.name) {
-                    popUpTo(ScreensRoutes.Splash.name) {
-                        inclusive = true
-                    } // remove splash from backstack
+            Splash {route->
+                when (route) {
+                    ScreensRoutes.SignIn.name -> {
+                        navController.navigate(ScreensRoutes.SignIn.name) {
+                            popUpTo(ScreensRoutes.Splash.name) {
+                                inclusive = true
+                            } // remove splash from backstack
+                        }
+                    }
+                    ScreensRoutes.Home.name -> {
+                        navController.navigate(ScreensRoutes.Home.name) {
+                            popUpTo(ScreensRoutes.Splash.name) {
+                                inclusive = true
+                            } // remove splash from backstack
+                        }
+                    }
                 }
+
+
             }
         }
 
@@ -32,7 +45,7 @@ fun AppNavigation() {
         }
 
         composable(ScreensRoutes.SignIn.name) {
-            SignIn({ str, str1 ->
+            SignIn({
                 navController.navigate(ScreensRoutes.Home.name) {
                     popUpTo(ScreensRoutes.SignIn.name) {
                         inclusive = true

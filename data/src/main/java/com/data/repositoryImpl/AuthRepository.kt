@@ -6,6 +6,7 @@ import com.domain.api.AppResult
 import com.domain.model.request.CreateUserRequest
 import com.domain.model.request.LoginRequest
 import com.domain.model.response.CreateUserResponse
+import com.domain.model.response.LoginResponse
 import com.domain.model.response.StandardResponse
 import com.domain.repository.IAuthRepository
 import javax.inject.Inject
@@ -15,7 +16,7 @@ class AuthRepository @Inject constructor(val apiInterface: ApiInterface) : IAuth
 
     override suspend fun loginApi(
         loginRequest: LoginRequest
-    ): AppResult<StandardResponse> {
+    ): AppResult<LoginResponse> {
         return safeApiCall{ apiInterface.loginApi(loginRequest) }
     }
 
