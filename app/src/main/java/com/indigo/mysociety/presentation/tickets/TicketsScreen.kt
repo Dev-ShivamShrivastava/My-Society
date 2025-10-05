@@ -22,6 +22,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +38,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.domain.model.response.ServiceTicketListResponse
@@ -83,7 +86,15 @@ fun TicketsScreen() {
             contentColor = Color(0xFF1E88E5),
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(Dimens._4dp)
+                .shadow(Dimens._4dp),
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    Modifier
+                        .tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                    color = Color(0xFF1E88E5), // 👈 your custom color
+                    height = 3.dp // optional: make it thicker/thinner
+                )
+            }
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
