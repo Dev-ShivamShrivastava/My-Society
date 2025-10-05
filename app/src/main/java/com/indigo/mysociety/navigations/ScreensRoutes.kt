@@ -4,5 +4,7 @@ enum class ScreensRoutes {
     Splash,
     SignUp,
     SignIn,
-    Home
+    Home,
+    Tickets,
+    Settings
 }

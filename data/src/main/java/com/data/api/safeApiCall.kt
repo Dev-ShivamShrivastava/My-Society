@@ -23,7 +23,14 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): AppResult<T> {
                     println(errorBody)
                     errorBody.message?:"Bad Request"
                 }
-                401 -> "Unauthorized"
+                401 -> {
+                    val error = e.response()?.errorBody()?.string()
+                    println(error)
+
+                    val errorBody = Gson().fromJson(error, StandardResponse::class.java)
+                    println(errorBody)
+                    errorBody.message?:"Unauthorized"
+                }
                 403 -> "Forbidden"
                 404 -> "Not Found"
                 500 -> "Internal Server Error"

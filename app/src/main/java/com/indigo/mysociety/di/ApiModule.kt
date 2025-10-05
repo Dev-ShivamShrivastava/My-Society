@@ -43,6 +43,7 @@ class ApiModule {
             val token = runBlocking {
                 dataStore.readToken(PreferenceKeys.KEY_AUTH_TOKEN).first()
             }
+            println("token $token")
             val request = chain.request().newBuilder().apply {
                 if (token.isNotEmpty()){
                     addHeader(HEADER_AUTHORIZATION_KEY,token)

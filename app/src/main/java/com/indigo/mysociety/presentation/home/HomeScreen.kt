@@ -40,6 +40,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,16 +60,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.domain.model.request.CreateServiceRequest
+import com.domain.model.request.LoginRequest
 import com.indigo.mysociety.R
 import com.indigo.mysociety.presentation.commonUI.LabeledInput
 import com.indigo.mysociety.utils.MyFontFamily
+import com.indigo.mysociety.utils.isValidEmail
+import com.indigo.mysociety.utils.showToast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
+fun HomeScreen() {
 
     val viewModel: HomeVM = hiltViewModel()
     val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
+
 
     LaunchedEffect(Unit) {
         viewModel.toastEvent.collect { message ->
@@ -91,6 +98,18 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
         animationSpec = tween(durationMillis = 600),
         label = "rotation"
     )
+
+    // ⭐ React to API Response directly here
+    LaunchedEffect(state.response) {
+        state.response?.let { response ->
+            if (response.status == "Success") {
+                context.showToast(response.message ?: "Service request created successfully")
+                isFlipped = true
+            } else {
+                context.showToast(response.message ?: "Service request created successfully")
+            }
+        }
+    }
 
 
     // 🔙 Handle back press
@@ -335,8 +354,34 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
                             // Submit Button
                             Button(
                                 onClick = {
-                                    isFlipped = true
-                                    onSubmit(name, phone, service, message)
+                                    when {
+                                        name.isBlank() -> {
+                                            context.showToast("Name is required")
+                                        }
+
+                                        phone.isBlank() -> {
+                                            context.showToast("Phone number is required")
+                                        }
+
+                                        service.isBlank() -> {
+                                            context.showToast("Service is required")
+                                        }
+
+                                        message.isBlank() -> {
+                                            context.showToast("Message is required")
+                                        }
+
+                                        else -> {
+                                            viewModel.createServiceRequestApi(
+                                                CreateServiceRequest(
+                                                    name = name,
+                                                    phoneNo = phone,
+                                                    service = service,
+                                                    message = message
+                                                )
+                                            )
+                                        }
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -393,8 +438,17 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
                                             try {
                                                 val phoneNumber =
                                                     "919507318475" // 👈 add country code + number (without + sign)
-                                                val message =
-                                                    "Hello, I need some help!" // 👈 your default message
+                                                // Final formatted message
+                                                val message = """
+Hello, I need some help regarding "$service".
+Here are my details:
+
+Name: $name
+Phone: $phone
+Message: $message
+""".trimIndent()
+
+
                                                 val url = "https://wa.me/$phoneNumber?text=${
                                                     Uri.encode(message)
                                                 }"
@@ -481,7 +535,5 @@ fun HomeScreen(onSubmit: (String, String, String, String) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun HomePreview() {
-    HomeScreen({ str, str1, str2, str3 ->
-
-    })
+    HomeScreen()
 }

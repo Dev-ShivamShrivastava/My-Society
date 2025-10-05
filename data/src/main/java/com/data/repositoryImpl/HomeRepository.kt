@@ -11,19 +11,13 @@ import com.domain.model.response.CreateUserResponse
 import com.domain.model.response.LoginResponse
 import com.domain.model.response.StandardResponse
 import com.domain.repository.IAuthRepository
+import com.domain.repository.IHomeRepository
 import javax.inject.Inject
 
 
-class AuthRepository @Inject constructor(val apiInterface: ApiInterface) : IAuthRepository {
+class HomeRepository @Inject constructor(val apiInterface: ApiInterface) : IHomeRepository {
 
-    override suspend fun loginApi(
-        loginRequest: LoginRequest
-    ): AppResult<LoginResponse> {
-        return safeApiCall{ apiInterface.loginApi(loginRequest) }
+    override suspend fun createServiceRequestApi(createServiceRequestRequest: CreateServiceRequest): AppResult<CreateServiceResponse> {
+        return safeApiCall{ apiInterface.createServiceRequestApi(createServiceRequestRequest) }
     }
-
-    override suspend fun createUserApi(createUserRequest: CreateUserRequest): AppResult<CreateUserResponse> {
-        return safeApiCall{ apiInterface.createUserApi(createUserRequest) }
-    }
-
 }
