@@ -6,6 +6,7 @@ import com.domain.useCase.CreateServiceRequestUseCase
 import com.domain.useCase.CreateUserUseCase
 import com.domain.useCase.LoginUseCase
 import com.domain.useCase.ServiceListUseCase
+import com.domain.useCase.ServiceTicketListUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,5 +28,7 @@ class AppModule {
     @Provides
     fun serviceListUseCase(homeRepository: HomeRepository) =
         ServiceListUseCase(homeRepository)
+    @Provides
+    fun serviceTicketListUseCase(homeRepository: HomeRepository) = ServiceTicketListUseCase(homeRepository)
 
 }

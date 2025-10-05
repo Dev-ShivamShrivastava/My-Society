@@ -10,6 +10,7 @@ import com.domain.model.response.CreateServiceResponse
 import com.domain.model.response.CreateUserResponse
 import com.domain.model.response.LoginResponse
 import com.domain.model.response.ServiceListResponse
+import com.domain.model.response.ServiceTicketListResponse
 import com.domain.model.response.StandardResponse
 import com.domain.repository.IAuthRepository
 import com.domain.repository.IHomeRepository
@@ -24,5 +25,9 @@ class HomeRepository @Inject constructor(val apiInterface: ApiInterface) : IHome
 
     override suspend fun getServiceListApi(): AppResult<ServiceListResponse> {
         return safeApiCall{ apiInterface.getServiceListApi() }
+    }
+
+    override suspend fun getServiceTicketListApi(status: String): AppResult<ServiceTicketListResponse> {
+        return safeApiCall{ apiInterface.getServiceTicketListApi(status) }
     }
 }

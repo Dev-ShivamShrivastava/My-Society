@@ -26,15 +26,23 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
 
-    val bottomBarScreens = listOf(ScreensRoutes.Home.name, ScreensRoutes.Tickets.name, ScreensRoutes.Settings.name) // only show for these
+    val bottomBarScreens = listOf(
+        ScreensRoutes.Home.name,
+        ScreensRoutes.Tickets.name,
+        ScreensRoutes.Settings.name
+    ) // only show for these
 
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry.value?.destination?.route
 
     Column(modifier = Modifier.fillMaxSize()) {
-        NavHost(navController = navController, startDestination = ScreensRoutes.Splash.name, modifier = Modifier.weight(1f)) {
+        NavHost(
+            navController = navController,
+            startDestination = ScreensRoutes.Splash.name,
+            modifier = Modifier.weight(1f)
+        ) {
             composable(ScreensRoutes.Splash.name) {
-                Splash {route->
+                Splash { route ->
                     when (route) {
                         ScreensRoutes.SignIn.name -> {
                             navController.navigate(ScreensRoutes.SignIn.name) {
@@ -43,6 +51,7 @@ fun AppNavigation() {
                                 } // remove splash from backstack
                             }
                         }
+
                         ScreensRoutes.Home.name -> {
                             navController.navigate(ScreensRoutes.Home.name) {
                                 popUpTo(ScreensRoutes.Splash.name) {
@@ -86,7 +95,11 @@ fun AppNavigation() {
                 TicketsScreen()
             }
             composable(ScreensRoutes.Settings.name) {
-                SettingsScreen()
+                SettingsScreen(onLogoutClick={
+                    navController.navigate(ScreensRoutes.SignIn.name) {
+                        popUpTo(ScreensRoutes.Home.name) { inclusive = true } // clears backstack
+                    }
+                },onChangePasswordClick= {},onPrivacyPolicyClick= {},onFAQClick= {})
             }
 
         }

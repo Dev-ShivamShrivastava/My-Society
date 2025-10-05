@@ -9,8 +9,10 @@ import com.domain.model.response.CreateServiceResponse
 import com.domain.model.response.CreateUserResponse
 import com.domain.model.response.LoginResponse
 import com.domain.model.response.ServiceListResponse
+import com.domain.model.response.ServiceTicketListResponse
 
 interface IHomeRepository {
     suspend fun createServiceRequestApi(createServiceRequestRequest: CreateServiceRequest): AppResult<CreateServiceResponse>
     suspend fun getServiceListApi(): AppResult<ServiceListResponse>
+    suspend fun getServiceTicketListApi(status: String): AppResult<ServiceTicketListResponse>
 }

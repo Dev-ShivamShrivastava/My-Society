@@ -19,11 +19,11 @@ import com.squareup.moshi.JsonClass
 */
 @JsonClass(generateAdapter = true)
 data class LoginResponse(
-    var `data`: Data? = null,
+    var `data`: UserInfoData? = null,
     var message: String? = null,
     var status: String? = null
 ) {
-    data class Data(
+    data class UserInfoData(
         var dob: String? = null,
         var email: String? = null,
         var id: String? = null,

@@ -4,12 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.domain.api.AppResult
 import com.domain.model.request.CreateServiceRequest
-import com.domain.model.request.LoginRequest
 import com.domain.useCase.CreateServiceRequestUseCase
 import com.domain.useCase.ServiceListUseCase
+import com.domain.useCase.ServiceTicketListUseCase
 import com.indigo.mysociety.dataStores.DataStorePrefs
-import com.indigo.mysociety.dataStores.PreferenceKeys
-import com.indigo.mysociety.presentation.signIn.LoginState
 import com.indigo.mysociety.utils.toArrayList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,6 +23,7 @@ import javax.inject.Inject
 class HomeVM @Inject constructor(
     private val createServiceRequestUseCase: CreateServiceRequestUseCase,
     private val serviceListUseCase: ServiceListUseCase,
+    private val serviceTicketListUseCase: ServiceTicketListUseCase,
     private val dataStorePrefs: DataStorePrefs
 ) : ViewModel() {
 

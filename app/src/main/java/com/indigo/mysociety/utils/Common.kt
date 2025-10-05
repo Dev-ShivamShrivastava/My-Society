@@ -15,6 +15,9 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.indigo.mysociety.R
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 val MyFontFamily = FontFamily(
     Font(R.font.dm_serif_text_regular, weight = FontWeight.Normal),
@@ -34,6 +37,25 @@ fun isValidEmail(email: String): Boolean {
 fun <T>List<T>?.toArrayList(): ArrayList<T> {
     if (this == null) return ArrayList()
     return ArrayList(this)
+}
+
+fun String.formatUtcToIstDate(): String {
+    return try {
+        // Step 1: Define input format (UTC)
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        // Step 2: Define output format (IST)
+        val outputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        outputFormat.timeZone = TimeZone.getTimeZone("Asia/Kolkata")
+
+        // Step 3: Parse and convert
+        val date = inputFormat.parse(this)
+        outputFormat.format(date!!)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        this
+    }
 }
 
 
