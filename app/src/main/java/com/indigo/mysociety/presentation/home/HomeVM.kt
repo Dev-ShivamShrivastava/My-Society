@@ -6,9 +6,11 @@ import com.domain.api.AppResult
 import com.domain.model.request.CreateServiceRequest
 import com.domain.model.request.LoginRequest
 import com.domain.useCase.CreateServiceRequestUseCase
+import com.domain.useCase.ServiceListUseCase
 import com.indigo.mysociety.dataStores.DataStorePrefs
 import com.indigo.mysociety.dataStores.PreferenceKeys
 import com.indigo.mysociety.presentation.signIn.LoginState
+import com.indigo.mysociety.utils.toArrayList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeVM @Inject constructor(
     private val createServiceRequestUseCase: CreateServiceRequestUseCase,
+    private val serviceListUseCase: ServiceListUseCase,
     private val dataStorePrefs: DataStorePrefs
 ) : ViewModel() {
 
@@ -30,6 +33,15 @@ class HomeVM @Inject constructor(
 
     private val _toastEvent = MutableSharedFlow<String>()
     val toastEvent = _toastEvent.asSharedFlow()
+
+    var serviceList: MutableList<String> = mutableListOf()
+    var whatsappNumber: String = ""
+    var mobileNumber: String = ""
+
+    init {
+        getServiceList()
+    }
+
 
     fun createServiceRequestApi(createServiceRequestRequest: CreateServiceRequest) {
         viewModelScope.launch {
@@ -52,6 +64,35 @@ class HomeVM @Inject constructor(
 
                     is AppResult.Error -> {
                         _state.value = _state.value.copy(isLoading = false, error = result.message)
+                        _toastEvent.emit(result.message)
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    private fun getServiceList(){
+        viewModelScope.launch {
+            serviceListUseCase.invoke().collect { result ->
+                when (result) {
+                    is AppResult.Loading -> {
+
+                    }
+
+                    is AppResult.Success -> {
+                        if (result.data.status == "Success"){
+                            serviceList = result.data.data?.services.toArrayList()
+                            whatsappNumber = result.data.data?.whatsappNo ?:""
+                            mobileNumber = result.data.data?.mobileNo ?:""
+                        }else {
+                            _toastEvent.emit(result.data.message?:"")
+                        }
+                    }
+
+                    is AppResult.Error -> {
+
                         _toastEvent.emit(result.message)
                     }
                 }

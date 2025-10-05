@@ -89,7 +89,6 @@ fun HomeScreen() {
     var service by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
 
-    val services = listOf("Plumbing", "Cleaning", "Electrical", "Painting")
     var expanded by remember { mutableStateOf(false) }
 
     var isFlipped by remember { mutableStateOf(false) }
@@ -227,7 +226,11 @@ fun HomeScreen() {
                                 label = "Phone Number",
                                 labelColor = Color.White,
                                 value = phone,
-                                onValueChange = { phone = it },
+                                onValueChange = {
+                                    if (it.length <= 10) {
+                                        phone = it
+                                    }
+                                },
                                 keyboardType = KeyboardType.Phone
                             )
 
@@ -292,7 +295,7 @@ fun HomeScreen() {
                                     expanded = expanded,
                                     onDismissRequest = { expanded = false }
                                 ) {
-                                    services.forEach { option ->
+                                    viewModel.serviceList.forEach { option ->
                                         DropdownMenuItem(
                                             text = { Text(option) },
                                             onClick = {
@@ -437,7 +440,7 @@ fun HomeScreen() {
                                         .clickable {
                                             try {
                                                 val phoneNumber =
-                                                    "919507318475" // 👈 add country code + number (without + sign)
+                                                    viewModel.whatsappNumber // 👈 add country code + number (without + sign)
                                                 // Final formatted message
                                                 val message = """
 Hello, I need some help regarding "$service".
@@ -488,7 +491,7 @@ Message: $message
                                     modifier = Modifier
                                         .clickable {
                                             val intent = Intent(Intent.ACTION_DIAL).apply {
-                                                data = Uri.parse("tel:1234567890")
+                                                data = Uri.parse("tel:${viewModel.mobileNumber}")
                                             }
                                             context.startActivity(intent)
                                         }

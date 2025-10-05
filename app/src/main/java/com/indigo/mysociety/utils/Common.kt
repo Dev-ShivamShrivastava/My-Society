@@ -31,6 +31,12 @@ fun isValidEmail(email: String): Boolean {
     return emailRegex.matches(email)
 }
 
+fun <T>List<T>?.toArrayList(): ArrayList<T> {
+    if (this == null) return ArrayList()
+    return ArrayList(this)
+}
+
+
 @Composable
 fun CustomSnackBar(message: String, isError: Boolean) {
     Snackbar(

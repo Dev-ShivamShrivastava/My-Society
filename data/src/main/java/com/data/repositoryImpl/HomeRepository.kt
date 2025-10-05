@@ -9,6 +9,7 @@ import com.domain.model.request.LoginRequest
 import com.domain.model.response.CreateServiceResponse
 import com.domain.model.response.CreateUserResponse
 import com.domain.model.response.LoginResponse
+import com.domain.model.response.ServiceListResponse
 import com.domain.model.response.StandardResponse
 import com.domain.repository.IAuthRepository
 import com.domain.repository.IHomeRepository
@@ -19,5 +20,9 @@ class HomeRepository @Inject constructor(val apiInterface: ApiInterface) : IHome
 
     override suspend fun createServiceRequestApi(createServiceRequestRequest: CreateServiceRequest): AppResult<CreateServiceResponse> {
         return safeApiCall{ apiInterface.createServiceRequestApi(createServiceRequestRequest) }
+    }
+
+    override suspend fun getServiceListApi(): AppResult<ServiceListResponse> {
+        return safeApiCall{ apiInterface.getServiceListApi() }
     }
 }

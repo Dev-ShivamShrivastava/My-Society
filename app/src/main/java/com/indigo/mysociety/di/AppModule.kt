@@ -5,6 +5,7 @@ import com.data.repositoryImpl.HomeRepository
 import com.domain.useCase.CreateServiceRequestUseCase
 import com.domain.useCase.CreateUserUseCase
 import com.domain.useCase.LoginUseCase
+import com.domain.useCase.ServiceListUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +22,10 @@ class AppModule {
     fun createUserUseCase(authRepository: AuthRepository) = CreateUserUseCase(authRepository)
 
     @Provides
-    fun createServiceRequestUseCase(homeRepository: HomeRepository) =
-        CreateServiceRequestUseCase(homeRepository)
+    fun createServiceRequestUseCase(homeRepository: HomeRepository) = CreateServiceRequestUseCase(homeRepository)
+
+    @Provides
+    fun serviceListUseCase(homeRepository: HomeRepository) =
+        ServiceListUseCase(homeRepository)
 
 }

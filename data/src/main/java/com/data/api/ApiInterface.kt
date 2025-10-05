@@ -6,8 +6,10 @@ import com.domain.model.request.LoginRequest
 import com.domain.model.response.CreateServiceResponse
 import com.domain.model.response.CreateUserResponse
 import com.domain.model.response.LoginResponse
+import com.domain.model.response.ServiceListResponse
 import com.domain.model.response.StandardResponse
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ApiInterface {
@@ -20,6 +22,9 @@ interface ApiInterface {
 
     @POST(createServiceRequestAPI)
     suspend fun createServiceRequestApi(@Body createServiceRequestRequest: CreateServiceRequest): CreateServiceResponse
+
+    @GET(getServiceListAPI)
+    suspend fun getServiceListApi(): ServiceListResponse
 
 
 }
