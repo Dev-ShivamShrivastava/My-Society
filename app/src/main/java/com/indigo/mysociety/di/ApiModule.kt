@@ -32,8 +32,11 @@ class ApiModule {
     @Provides
     fun provideDataStore(@ApplicationContext context: Context) = DataStorePrefs(context)
 
+//    @Provides
+//    fun provideBaseUrl() = "https://expositorial-deistically-clementina.ngrok-free.dev/"//"http://192.168.0.110:4000/"
+
     @Provides
-    fun provideBaseUrl() = "http://192.168.0.110:4000/"
+    fun provideBaseUrl() = "http://192.168.0.111:3000/"
 
     @Provides
     fun provideHeaderInterceptor(

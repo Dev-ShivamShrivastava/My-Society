@@ -11,15 +11,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.domain.model.response.ServiceTicketListResponse
+import com.google.gson.Gson
 import com.indigo.mysociety.presentation.home.HomeScreen
 import com.indigo.mysociety.presentation.settings.SettingsScreen
 import com.indigo.mysociety.presentation.signIn.SignIn
 import com.indigo.mysociety.presentation.signUp.SignUp
 import com.indigo.mysociety.presentation.splash.Splash
+import com.indigo.mysociety.presentation.ticketDetails.TicketDetailsScreen
 import com.indigo.mysociety.presentation.tickets.TicketsScreen
 
 @Composable
@@ -93,7 +98,25 @@ fun AppNavigation() {
                 HomeScreen()
             }
             composable(ScreensRoutes.Tickets.name) {
-                TicketsScreen()
+                TicketsScreen(
+                    onTicketClick = { ticketJson ->
+                        navController.navigate("${ScreensRoutes.TicketDetails.name}/$ticketJson")
+                    }
+
+                )
+            }
+            composable(route = "${ScreensRoutes.TicketDetails.name}/{ticketJson}", arguments = listOf(
+                navArgument("ticketJson") {
+                    type = NavType.StringType
+                }
+            )) {backStackEntry ->
+                val ticketJson = backStackEntry.arguments?.getString("ticketJson")
+                val ticket =
+                    Gson().fromJson(
+                        ticketJson,
+                        ServiceTicketListResponse.ServiceTicketData::class.java
+                    )
+                TicketDetailsScreen(ticket)
             }
             composable(ScreensRoutes.Settings.name) {
                 SettingsScreen(onLogoutClick={

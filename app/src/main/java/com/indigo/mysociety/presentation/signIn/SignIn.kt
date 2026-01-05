@@ -61,26 +61,19 @@ fun SignIn(
     val viewModel: SignInVM = hiltViewModel()
 
     // Dynamic fields (state)
-    var emailOrPhone by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var emailOrPhone by remember { mutableStateOf("shivam@gmail.com") }
+    var password by remember { mutableStateOf("shivam123") }
 
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.toastEvent.collect { message ->
-            context.showToast(message)
-        }
-    }
-
-    // ⭐ React to API Response directly here
-    LaunchedEffect(state.response) {
-        state.response?.let { response ->
-            if (response.status == "Success") {
-                context.showToast(response.message ?: "Sign in successful")
-                onLogin() // ⭐ Go back after success
-            } else {
-                context.showToast(response.message ?: "Sign in failed")
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is LoginUiEvent.ShowToast -> context.showToast(event.message)
+                LoginUiEvent.NavigateHome -> {
+                    onLogin()
+                }
             }
         }
     }
@@ -224,23 +217,7 @@ fun SignIn(
             // Login Button
             Button(
                 onClick = {
-                    when {
-                        emailOrPhone.isBlank() -> {
-                            context.showToast("Email is required")
-                        }
-
-                        !isValidEmail(emailOrPhone) -> {
-                            context.showToast("Invalid Email")
-                        }
-
-                        password.isBlank() -> {
-                            context.showToast("Password is required")
-                        }
-                        else -> {
-                            viewModel.loginApi(LoginRequest(emailOrPhone, password))
-                        }
-                    }
-
+                    viewModel.onLoginClicked(emailOrPhone, password)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

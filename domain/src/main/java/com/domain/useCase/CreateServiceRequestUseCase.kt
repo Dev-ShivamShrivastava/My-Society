@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.flow
 class CreateServiceRequestUseCase(private val homeRepository: IHomeRepository) {
     operator fun invoke(createServiceRequestRequest: CreateServiceRequest): Flow<AppResult<CreateServiceResponse>> =
         flow {
-            emit(AppResult.Loading)
             emit(homeRepository.createServiceRequestApi(createServiceRequestRequest))
         }
 }

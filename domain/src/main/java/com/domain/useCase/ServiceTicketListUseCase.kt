@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.flow
 class ServiceTicketListUseCase(private val homeRepository: IHomeRepository) {
     operator fun invoke(status: String): Flow<AppResult<ServiceTicketListResponse>> =
         flow {
-            emit(AppResult.Loading)
             emit(homeRepository.getServiceTicketListApi(status))
         }
 }

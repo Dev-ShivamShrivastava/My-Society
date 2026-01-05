@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.flow
 
 class LoginUseCase(private val authRepository: IAuthRepository) {
     operator fun invoke(loginRequest: LoginRequest) = flow {
-        emit(AppResult.Loading)
         emit(authRepository.loginApi(loginRequest))
     }
 }

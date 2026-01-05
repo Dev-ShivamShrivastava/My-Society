@@ -24,8 +24,8 @@ class TicketVM @Inject constructor(
     private val _state = MutableStateFlow(TicketsState())
     val state: StateFlow<TicketsState> = _state.asStateFlow()
 
-    private val _toastEvent = MutableSharedFlow<String>()
-    val toastEvent = _toastEvent.asSharedFlow()
+    private val _ticketsUIEvent = MutableSharedFlow<TicketUIEvent>()
+    val ticketsUIEvent = _ticketsUIEvent.asSharedFlow()
 
 
     init {
@@ -34,10 +34,12 @@ class TicketVM @Inject constructor(
 
      fun getServiceTicketListApi(status: String){
         viewModelScope.launch {
+            _state.update {
+                it.copy(isLoading = false)
+            }
             serviceTicketListUseCase.invoke(status).collect { result ->
                 when (result) {
                     is AppResult.Loading -> {
-                        _state.update { it.copy(isLoading = true) }
                     }
 
                     is AppResult.Success -> {
@@ -46,7 +48,7 @@ class TicketVM @Inject constructor(
                                 it.copy(isLoading = false, response = result.data)
                             }
                         }else {
-                            _toastEvent.emit(result.data.message?:"")
+                            _ticketsUIEvent.emit(TicketUIEvent.ShowToast(result.data.message?:""))
                             _state.update {
                                 it.copy(isLoading = false, error = result.data.message ?: "")
                             }
@@ -54,7 +56,7 @@ class TicketVM @Inject constructor(
                     }
 
                     is AppResult.Error -> {
-                        _toastEvent.emit(result.message)
+                        _ticketsUIEvent.emit(TicketUIEvent.ShowToast(result.message?:""))
                         _state.value = _state.value.copy(isLoading = false, error = result.message)
                     }
                 }

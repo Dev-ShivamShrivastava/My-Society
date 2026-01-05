@@ -6,5 +6,6 @@ enum class ScreensRoutes {
     SignIn,
     Home,
     Tickets,
+    TicketDetails,
     Settings
 }

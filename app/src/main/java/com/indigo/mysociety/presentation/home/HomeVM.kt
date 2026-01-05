@@ -8,8 +8,10 @@ import com.domain.useCase.CreateServiceRequestUseCase
 import com.domain.useCase.ServiceListUseCase
 import com.domain.useCase.ServiceTicketListUseCase
 import com.indigo.mysociety.dataStores.DataStorePrefs
+import com.indigo.mysociety.utils.showToast
 import com.indigo.mysociety.utils.toArrayList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,8 +32,8 @@ class HomeVM @Inject constructor(
     private val _state = MutableStateFlow(CreateServiceState())
     val state: StateFlow<CreateServiceState> = _state.asStateFlow()
 
-    private val _toastEvent = MutableSharedFlow<String>()
-    val toastEvent = _toastEvent.asSharedFlow()
+    private val _homeUiEvent = MutableSharedFlow<HomeUIEvent>()
+    val homeUiEvent = _homeUiEvent.asSharedFlow()
 
     var serviceList: MutableList<String> = mutableListOf()
     var whatsappNumber: String = ""
@@ -44,17 +46,19 @@ class HomeVM @Inject constructor(
 
     fun createServiceRequestApi(createServiceRequestRequest: CreateServiceRequest) {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
             createServiceRequestUseCase.invoke(createServiceRequestRequest).collect { result ->
                 when (result) {
                     is AppResult.Loading -> {
-                        _state.update { it.copy(isLoading = true) }
                     }
 
                     is AppResult.Success -> {
                         if (result.data.status == "Success"){
                             _state.update { it.copy(isLoading = false, response = result.data) }
+                            _homeUiEvent.emit(HomeUIEvent.ShowToast(result.data.message?:"Service request created successfully"))
+                            _homeUiEvent.emit(HomeUIEvent.NavigateDetailsScreen)
                         }else {
-                            _toastEvent.emit(result.data.message?:"")
+                            _homeUiEvent.emit(HomeUIEvent.ShowToast(result.data.message?:""))
                             _state.update {
                                 it.copy(isLoading = false, error = result.data.message ?: "")
                             }
@@ -62,8 +66,8 @@ class HomeVM @Inject constructor(
                     }
 
                     is AppResult.Error -> {
-                        _state.value = _state.value.copy(isLoading = false, error = result.message)
-                        _toastEvent.emit(result.message)
+                        _homeUiEvent.emit(HomeUIEvent.ShowToast(result.message))
+
                     }
                 }
             }
@@ -86,13 +90,13 @@ class HomeVM @Inject constructor(
                             whatsappNumber = result.data.data?.whatsappNo ?:""
                             mobileNumber = result.data.data?.mobileNo ?:""
                         }else {
-                            _toastEvent.emit(result.data.message?:"")
+                            _homeUiEvent.emit(HomeUIEvent.ShowToast(result.data.message?:""))
+
                         }
                     }
 
                     is AppResult.Error -> {
-
-                        _toastEvent.emit(result.message)
+                        _homeUiEvent.emit(HomeUIEvent.ShowToast(result.message))
                     }
                 }
             }

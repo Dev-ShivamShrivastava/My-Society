@@ -1,5 +1,8 @@
 package com.domain.model.response
 
+import java.text.SimpleDateFormat
+import java.util.Locale
+
 /**
 {
     "status": "Success",
@@ -34,5 +37,12 @@ data class ServiceTicketListResponse(
         var service: String? = null,
         var status: String? = null,
         var userId: String? = null
-    )
+    ){
+        fun formatUtcToIstDate(): String {
+            val utcFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            val utcDate = utcFormat.parse(createdAt)
+            val istFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
+            return istFormat.format(utcDate)
+        }
+    }
 }

@@ -1,7 +1,8 @@
 package com.indigo.mysociety.presentation.tickets
 
-import android.widget.Toast
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,14 +41,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.domain.model.response.ServiceTicketListResponse
+import com.google.gson.Gson
 import com.indigo.mysociety.utils.Dimens
 import com.indigo.mysociety.utils.formatUtcToIstDate
+import com.indigo.mysociety.utils.showToast
 import com.indigo.mysociety.utils.toArrayList
 
 @Composable
-fun TicketsScreen() {
+fun TicketsScreen(
+    onTicketClick: (json:String) -> Unit,
+) {
     val viewModel: TicketVM = hiltViewModel()
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -55,8 +59,10 @@ fun TicketsScreen() {
     val tabs = listOf("Pending", "Completed")
 
     LaunchedEffect(Unit) {
-        viewModel.toastEvent.collect { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        viewModel.ticketsUIEvent.collect { event ->
+            when(event){
+                is TicketUIEvent.ShowToast -> context.showToast(event.message)
+            }
         }
     }
 
@@ -132,7 +138,7 @@ fun TicketsScreen() {
                         contentPadding = PaddingValues(bottom = Dimens._24dp)
                     ) {
                         items(currentList) { service ->
-                            ServiceCard(service = service)
+                            ServiceCard(service = service,onTicketClick)
                         }
                     }
                 }
@@ -143,7 +149,10 @@ fun TicketsScreen() {
 }
 
 @Composable
-fun ServiceCard(service: ServiceTicketListResponse.ServiceTicketData) {
+fun ServiceCard(
+    service: ServiceTicketListResponse.ServiceTicketData,
+    onTicketClick: (json: String) -> Unit
+) {
     val statusColor = when (service.status) {
         "Pending" -> Color(0xFFFFC107)
         "Approved" -> Color(0xFF4CAF50)
@@ -155,7 +164,10 @@ fun ServiceCard(service: ServiceTicketListResponse.ServiceTicketData) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(Dimens._4dp, RoundedCornerShape(Dimens._16dp)),
+            .shadow(Dimens._4dp, RoundedCornerShape(Dimens._16dp)).clickable {
+                val json = Uri.encode(Gson().toJson(service))
+                onTicketClick(json)
+            },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(Dimens._16dp)
     ) {

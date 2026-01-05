@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import com.indigo.mysociety.dataStores.DataStorePrefs
 import com.indigo.mysociety.dataStores.PreferenceKeys
 import com.indigo.mysociety.presentation.signUp.CreateUserState
+import com.indigo.mysociety.utils.isValidEmail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,34 +35,43 @@ class SignInVM @Inject constructor(
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
 
-    private val _toastEvent = MutableSharedFlow<String>()
-    val toastEvent = _toastEvent.asSharedFlow()
 
+    private val _uiEvent = MutableSharedFlow<LoginUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
+
+    fun onLoginClicked(email: String, password: String) {
+        viewModelScope.launch {
+            when {
+                email.isBlank() -> _uiEvent.emit(LoginUiEvent.ShowToast("Email is required" ))
+                !isValidEmail(email) -> _uiEvent.emit(LoginUiEvent.ShowToast("Invalid email" ))
+                password.isBlank() -> _uiEvent.emit(LoginUiEvent.ShowToast("Password is required" ))
+                else -> loginApi(LoginRequest(email, password))
+            }
+        }
+    }
 
     fun loginApi(loginRequest: LoginRequest) {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
             loginUseCase.invoke(loginRequest).collect { result ->
                 when (result) {
                     is AppResult.Loading -> {
-                        _state.update { it.copy(isLoading = true) }
                     }
-
                     is AppResult.Success -> {
                         if (result.data.status == "Success"){
                             dataStorePrefs.putPreference(PreferenceKeys.KEY_AUTH_TOKEN, result.data.data?.token?:"")
                             dataStorePrefs.putPreference(PreferenceKeys.KEY_USER_INFO, Gson().toJson(result.data.data))
                             _state.update { it.copy(isLoading = false, response = result.data) }
+                            _uiEvent.emit(LoginUiEvent.NavigateHome)
                         }else {
-                            _toastEvent.emit(result.data.message?:"")
-                            _state.update {
-                                it.copy(isLoading = false, error = result.data.message ?: "")
-                            }
+                            _state.value = _state.value.copy(isLoading = false)
+                            _uiEvent.emit(LoginUiEvent.ShowToast(result.data.message ?: "Error"))
                         }
                     }
 
                     is AppResult.Error -> {
                         _state.value = _state.value.copy(isLoading = false, error = result.message)
-                        _toastEvent.emit(result.message)
+                        _uiEvent.emit(LoginUiEvent.ShowToast(result.message))
                     }
                 }
             }
